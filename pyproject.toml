@@ -1,0 +1,10 @@
+[project]
+name = "info-vis"
+version = "0.1.0"
+description = "Info visualisation project. Dublin property prices and trees."
+requires-python = ">=3.9"
+dependencies = [
+    "jupyterlab>=4.5.6",
+    "matplotlib>=3.9.4",
+    "pandas>=2.3.3",
+]
