@@ -48,7 +48,7 @@
                   "aggregate": "count",
                   "type": "quantitative",
                   "scale": {
-                    "scheme": "greens",
+                    "scheme": "yellowgreen",
                     "domain": [0, 125],
                     "clamp":true
                   },
@@ -177,7 +177,7 @@
             "domain": ["200+", "100-200", "50-100", "20-50", "0-20"],
             "scheme": "tableau10"
           },
-          "legend": {"title": "Trees within 100m"}
+          "legend": {"title": "Trees within 100m", "symbolStrokeWidth": 4}
         },
         "opacity": {
           "condition": {"param": "band_selection", "value": 1},
