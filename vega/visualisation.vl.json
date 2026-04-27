@@ -1,0 +1,194 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "title": {
+    "text": "Trees & Property Prices in Dublin City",
+    "fontSize": 20,
+    "anchor": "middle"
+  },
+  "resolve": {"scale": {"color": "independent"}},
+  "params": [
+    {
+      "name": "year_filter",
+      "value": 0,
+      "bind": {
+        "input": "select",
+        "options": [0, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026],
+        "labels": ["All", "2016", "2017", "2018", "2019", "2020", "2021", "2022", "2023", "2024", "2025", "2026"],
+        "name": "Year: "
+      }
+    }
+  ],
+  "vconcat": [
+    {
+      "resolve": {"scale": {"color": "independent"}},
+      "hconcat": [
+        {
+          "title": "Tree Density",
+          "width": 500,
+          "height": 400,
+          "projection": {
+            "type": "mercator",
+            "center": [-6.389, 53.415],
+            "scale": 110000
+          },
+          "layer": [
+            {
+              "data": {"url": "https://raw.githubusercontent.com/cian1118/info-vis/refs/heads/main/vega/trees.csv"},
+              "transform": [
+                {"bin": {"maxbins": 200}, "field": "POINT_X", "as": "lon_bin"},
+                {"bin": {"maxbins": 200}, "field": "POINT_Y", "as": "lat_bin"}
+              ],
+              "mark": {"type": "rect", "opacity": 0.8},
+              "encoding": {
+                "longitude": {"field": "lon_bin", "type": "quantitative"},
+                "latitude": {"field": "lat_bin", "type": "quantitative"},
+                "longitude2": {"field": "lon_bin_end"},
+                "latitude2": {"field": "lat_bin_end"},
+                "color": {
+                  "aggregate": "count",
+                  "type": "quantitative",
+                  "scale": {
+                    "scheme": "greens",
+                    "domain": [0, 125],
+                    "clamp":true
+                  },
+                  "legend": {"title": "Tree Count"}
+                },
+                "tooltip": [
+                  {"aggregate": "count", "type": "quantitative", "title": "Tree Count"}
+                ]
+              }
+            },
+            {
+              "data": {
+                "url": "https://raw.githubusercontent.com/cian1118/info-vis/refs/heads/main/vega/dublin_wgs84.geojson",
+                "format": {"property": "features"}
+              },
+              "mark": {
+                "type": "geoshape",
+                "fill": null,
+                "stroke": "grey",
+                "strokeWidth": 1
+              }
+            }
+          ]
+        },
+        {
+          "title": {
+            "text": "Property Sale Prices",
+            "subtitle": "Year filter in bottom left of page",
+            "subtitleFontStyle": "italic",
+            "subtitleFontSize": 11,
+            "subtitleColor": "grey"
+          },
+          "width": 500,
+          "height": 400,
+          "projection": {
+            "type": "mercator",
+            "center": [-6.389, 53.415],
+            "scale": 110000
+          },
+          "layer": [
+            {
+              "data": {"url": "https://raw.githubusercontent.com/cian1118/info-vis/refs/heads/main/vega/final_dublin_trees_prices.csv"},
+              "transform": [
+                {"filter": "datum.price < 100000000"},
+                {"filter": "year_filter == 0 || datum.year == year_filter"},
+                {"bin": {"maxbins": 200}, "field": "longitude", "as": "lon_bin"},
+                {"bin": {"maxbins": 200}, "field": "latitude", "as": "lat_bin"}
+              ],
+              "mark": {"type": "rect", "opacity": 0.8},
+              "encoding": {
+                "longitude": {"field": "lon_bin", "type": "quantitative"},
+                "latitude": {"field": "lat_bin", "type": "quantitative"},
+                "longitude2": {"field": "lon_bin_end"},
+                "latitude2": {"field": "lat_bin_end"},
+                "color": {
+                  "field": "price",
+                  "aggregate": "median",
+                  "type": "quantitative",
+                  "scale": {
+                    "scheme": "yelloworangered",
+                    "domain": [165000, 850000],
+                    "clamp": true
+                  },
+                  "legend": {"title": "Sale Price (€)"}
+                },
+                "tooltip": [
+                  {"field": "price", "aggregate": "median", "type": "quantitative", "format": ",.0f", "title": "Median Price (€)"},
+                  {"field": "year", "type": "ordinal", "title": "Year"}
+                ]
+              }
+            },
+            {
+              "data": {
+                "url": "https://raw.githubusercontent.com/cian1118/info-vis/refs/heads/main/vega/dublin_wgs84.geojson",
+                "format": {"property": "features"}
+              },
+              "mark": {
+                "type": "geoshape",
+                "fill": null,
+                "stroke": "grey",
+                "strokeWidth": 1
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": {
+        "text": "Median Property Price by Number of Trees within 100m (2016-2026)",
+        "subtitle": "Note: 2026 data is partial year only",
+        "subtitleFontStyle": "italic",
+        "subtitleFontSize": 11,
+        "subtitleColor": "grey"
+      },
+      "width": 1000,
+      "height": 400,
+      "data": {"url": "https://raw.githubusercontent.com/cian1118/info-vis/refs/heads/main/vega/final_dublin_trees_prices.csv"},
+      "transform": [
+      {"filter": "datum.price < 2000000"}
+      ],
+      "params": [
+        {
+          "name": "band_selection",
+          "select": {"type": "point", "fields": ["tree_count_band"]}
+        }
+      ],
+      "mark": {"type": "line", "point": false, "strokeWidth": 4, "interpolate": "monotone"},
+      "encoding": {
+        "x": {
+          "field": "year",
+          "type": "ordinal",
+          "axis": {"title": "Year", "labelAngle": 0}
+        },
+        "y": {
+          "field": "price",
+          "type": "quantitative",
+          "aggregate": "median",
+          "axis": {"title": "Median Price (€)", "format": ",.0f"},
+          "scale": {"zero": false}
+        },
+        "color": {
+          "field": "tree_count_band",
+          "type": "nominal",
+          "scale": {
+            "domain": ["200+", "100-200", "50-100", "20-50", "0-20"],
+            "scheme": "tableau10"
+          },
+          "legend": {"title": "Trees within 100m"}
+        },
+        "opacity": {
+          "condition": {"param": "band_selection", "value": 1},
+          "value": 0.2
+        },
+        "tooltip": [
+          {"field": "year", "type": "ordinal", "title": "Year"},
+          {"field": "tree_count_band", "type": "nominal", "title": "Trees within 100m"},
+          {"field": "price", "aggregate": "median", "type": "quantitative", "format": ",.0f", "title": "Median Price (€)"}
+        ]
+      }
+    }
+  ]
+}
