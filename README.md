@@ -19,6 +19,7 @@ An interactive dashboard exploring the relationship between urban tree density a
 ---
 
 ## Repository Structure
+```
 ├── vega/
 │   ├── final_dublin_trees_prices.csv   # processed property + tree dataset
 │   ├── trees.csv                       # Dublin trees point data
@@ -29,3 +30,4 @@ An interactive dashboard exploring the relationship between urban tree density a
 ├── README.md
 ├── .gitignore
 └── pyproject.toml
+```
